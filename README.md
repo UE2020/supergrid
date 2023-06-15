@@ -14,4 +14,5 @@ Setup:
 	Maximum entity size:  1000x1000
 Took 1.866101ms to insert 10,000 entities
 Took 3.663191ms to probe 10,000 entities
-Collisions: 32,900; average: 3.29```
+Collisions: 32,900; average: 3.29
+```
