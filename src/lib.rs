@@ -2,7 +2,7 @@ use arrayvec::ArrayVec;
 
 pub const FIXED_SIZE: usize = 32;
 
-/// A rectangular entity.
+/// A rectangular entity. **Identifier must be unique.**
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct Entity {
