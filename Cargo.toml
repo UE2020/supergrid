@@ -1,0 +1,22 @@
+[package]
+name = "supergrid"
+description = "An extremely optimized (unsafe) spatial hash grid."
+version = "0.1.0"
+license = "GPL-3.0"
+readme = "README.md"
+authors = ["Aspect"]
+keywords = ["physics", "collision", "grid", "spatial", "hash"]
+categories = ["simulation"]
+repository = "https://github.com/UE2020/supergrid"
+edition = "2021"
+
+[lib]
+crate-type = ["lib"]
+
+[dependencies]
+arrayvec = "0.7.3"
+
+[dev-dependencies]
+num-format = "0.4.4"
+structopt = "0.3.26"
+rand = "0.8.5"
