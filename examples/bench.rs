@@ -58,7 +58,7 @@ fn main() {
         grid.insert(&ent).expect("too many entities in cell");
         entities.push(ent);
     }
-    println!("Took {:?} to insert {} entities", now.elapsed(), opt.count.to_formatted_string(&Locale::en));
+    println!("Took {:?} to insert {} entities; average: {:?}", now.elapsed(), opt.count.to_formatted_string(&Locale::en), now.elapsed() / opt.count as u32);
     let mut hits = 0;
     let now = Instant::now();
     for ent in entities {
