@@ -1,6 +1,6 @@
 [package]
 name = "supergrid"
-description = "An extremely optimized (unsafe) spatial hash grid."
+description = "An extremely optimized (safe) spatial hash grid."
 version = "0.2.1"
 license = "GPL-3.0"
 readme = "README.md"
