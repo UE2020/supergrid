@@ -34,15 +34,16 @@ struct Opt {
 
 fn main() {
     let opt = Opt::from_args();
+	let mut grid = supergrid::Grid::new(2048, opt.cell_size);
     println!("Setup:");
-    println!("\tArena width:  {}", opt.width.to_formatted_string(&Locale::en));
-    println!("\tArena height: {}", opt.height.to_formatted_string(&Locale::en));
-    println!("\tCell size:    {}x{}", 1 << opt.cell_size, 1 << opt.cell_size);
-    println!("\tEntity count: {}", opt.count.to_formatted_string(&Locale::en));
-    println!("\tMinimum entity size:  {}x{}", opt.min_size, opt.min_size);
-	println!("\tMaximum entity size:  {}x{}", opt.max_size, opt.max_size);
+    println!("\tArena width:         {}", opt.width.to_formatted_string(&Locale::en));
+    println!("\tArena height:        {}", opt.height.to_formatted_string(&Locale::en));
+	println!("\tArena max size:      {}", grid.count().to_formatted_string(&Locale::en));
+    println!("\tCell size:           {}x{}", 1 << opt.cell_size, 1 << opt.cell_size);
+    println!("\tEntity count:        {}", opt.count.to_formatted_string(&Locale::en));
+    println!("\tMinimum entity size: {}x{}", opt.min_size, opt.min_size);
+	println!("\tMaximum entity size: {}x{}", opt.max_size, opt.max_size);
 
-    let mut grid = supergrid::Grid::new(1000, opt.cell_size);
     let mut rng = rand::thread_rng();
     let mut entities = vec![];
     let now = Instant::now();

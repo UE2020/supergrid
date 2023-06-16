@@ -50,11 +50,16 @@ pub struct Table<T: Default + Clone> {
 impl<T: Default + Clone> Table<T> {
     /// Create a new table with `size` entries.
     pub fn new(size: usize) -> Self {
-        let entries = vec![T::default(); size * 1000];
+        let entries = vec![T::default(); (size * 1000).next_power_of_two() + 1];
         Self {
             entries,
         }
     }
+
+	/// Get entry number.
+	pub fn count(&self) -> usize {
+		self.entries.len()
+	}
 
     #[inline(always)]
     fn index(&self, idx: u64) -> usize {
@@ -113,6 +118,11 @@ impl Grid {
         }
     }
 
+	/// Get size of internal tables.
+	pub fn count(&self) -> usize {
+		self.grid.count()
+	}
+
     /// Insert an entity.
     pub fn insert(&mut self, entity: &Entity) -> Result<(), CapacityError<u32>> {
         let sx = entity.x >> self.shift;
@@ -121,12 +131,14 @@ impl Grid {
         let ex = (entity.x + entity.width) >> self.shift;
         let ey = (entity.y + entity.height) >> self.shift;
 
+		let is_ideal = sx == ex && sy == ey;
+
         let map = self.maps.get_scalar_mut(entity.id);
         for y in sy..=ey {
             for x in sx..=ex {
                 let cell = self.grid.get_vector_mut(x, y);
                 map.0.push((x, y));
-                cell.0.try_push(entity.id)?;
+                cell.0.try_push(entity.id | ((is_ideal as u32) << 31))?;
             }
         }
 
@@ -138,7 +150,7 @@ impl Grid {
         let map = self.maps.get_scalar(id);
         for &(x, y) in map.0.iter() {
             let cell = self.grid.get_vector_mut(x, y);
-            let index = cell.0.iter().position(|x| *x == id).unwrap();
+            let index = cell.0.iter().position(|x| (*x & !(1 << 31)) == id).unwrap();
             cell.0.remove(index);
         }
     }
@@ -153,13 +165,21 @@ impl Grid {
         let ex = (query.x + query.width) >> self.shift;
         let ey = (query.y + query.height) >> self.shift;
 
+		let is_ideal = sx == ex && sy == ey;
+
         for y in sy..=ey {
             for x in sx..=ex {
                 let region = self.grid.get_vector(x, y);
                 for id in region.0.iter() {
-                    if !result.contains(id) {
-                        result.push(*id);
-                    }
+					// there CANNOT be duplicates if we are only checking a single cell.
+					// we do not have to deduplicate an ID if it is known to only occupy a single cell.
+					if id & (1 << 31) != 0 || is_ideal {
+						result.push(*id & !(1 << 31));
+					} else {
+						if !result.contains(id) {
+							result.push(*id);
+						}
+					}
                 }
             }
         }
