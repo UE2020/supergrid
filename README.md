@@ -1,5 +1,5 @@
 # supergrid
-A simple, optimized (unsafe) spatial hash grid.
+A simple, optimized, safe spatial hash grid.
 # Benchmark
 A benchmarking tool is included in the examples folder.
 ```
