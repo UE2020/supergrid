@@ -1,4 +1,4 @@
-use arrayvec::ArrayVec;
+use arrayvec::{ArrayVec, CapacityError};
 
 pub const FIXED_SIZE: usize = 32;
 
@@ -38,6 +38,9 @@ impl From<Entity> for Query {
 #[derive(Debug, Clone, Default)]
 struct Entry(ArrayVec<u32, FIXED_SIZE>);
 
+#[derive(Debug, Clone, Default)]
+struct Map(ArrayVec<(u32, u32), FIXED_SIZE>);
+
 /// An extremely optimized fixed-size hash table implementation.
 #[derive(Debug, Clone)]
 pub struct Table<T: Default + Clone> {
@@ -45,7 +48,7 @@ pub struct Table<T: Default + Clone> {
 }
 
 impl<T: Default + Clone> Table<T> {
-	/// Create a new table with `size` entries.
+    /// Create a new table with `size` entries.
     pub fn new(size: usize) -> Self {
         let entries = vec![T::default(); size * 1000];
         Self {
@@ -58,35 +61,35 @@ impl<T: Default + Clone> Table<T> {
         (hash_u64(idx) % self.entries.len() as u64) as usize
     }
 
-	/// Get a mutable reference to an entry from a 2D key.
+    /// Get a mutable reference to an entry from a 2D key.
     #[inline(always)]
     pub fn get_vector_mut(&mut self, x: u32, y: u32) -> &mut T {
         let idx = self.index(vector_hash(x, y));
         unsafe { self.entries.get_unchecked_mut(idx) }
     }
 
-	/// Get a reference to an entry from a 2D key.
+    /// Get a reference to an entry from a 2D key.
     #[inline(always)]
     pub fn get_vector(&self, x: u32, y: u32) -> &T {
         let idx = self.index(vector_hash(x, y));
         unsafe { self.entries.get_unchecked(idx) }
     }
 
-	/// Get a reference to an entry from a scalar key.
+    /// Get a reference to an entry from a scalar key.
     #[inline(always)]
     pub fn get_scalar(&self, s: u32) -> &T {
         let idx = self.index(hash_u64(s as u64));
         unsafe { self.entries.get_unchecked(idx) }
     }
 
-	/// Get a mutable reference to an entry from a scalar key.
+    /// Get a mutable reference to an entry from a scalar key.
     #[inline(always)]
     pub fn get_scalar_mut(&mut self, s: u32) -> &mut T {
         let idx = self.index(hash_u64(s as u64));
         unsafe { self.entries.get_unchecked_mut(idx) }
     }
 
-	/// Clear the table.
+    /// Clear the table.
     pub fn clear(&mut self) {
         self.entries.clear();
     }
@@ -96,35 +99,51 @@ impl<T: Default + Clone> Table<T> {
 #[derive(Debug, Clone)]
 pub struct Grid {
     grid: Table<Entry>,
+    maps: Table<Map>,
     shift: u32,
 }
 
 impl Grid {
-	/// Create a new grid with a fixed bucket size and cell size.
+    /// Create a new grid with a fixed bucket size and cell size.
     pub fn new(size: usize, shift: u32) -> Self {
         Self {
             grid: Table::new(size),
+            maps: Table::new(size),
             shift,
         }
     }
 
-	/// Insert an entity.
-    pub fn insert(&mut self, entity: &Entity) {
+    /// Insert an entity.
+    pub fn insert(&mut self, entity: &Entity) -> Result<(), CapacityError<u32>> {
         let sx = entity.x >> self.shift;
         let sy = entity.y >> self.shift;
 
         let ex = (entity.x + entity.width) >> self.shift;
         let ey = (entity.y + entity.height) >> self.shift;
 
+        let map = self.maps.get_scalar_mut(entity.id);
         for y in sy..=ey {
             for x in sx..=ex {
-				let cell = self.grid.get_vector_mut(x, y);
-                unsafe { cell.0.push_unchecked(entity.id) };
+                let cell = self.grid.get_vector_mut(x, y);
+                map.0.push((x, y));
+                cell.0.try_push(entity.id)?;
             }
+        }
+
+        Ok(())
+    }
+
+    /// Delete an entity by ID.
+    pub fn delete(&mut self, id: u32) {
+        let map = self.maps.get_scalar(id);
+        for &(x, y) in map.0.iter() {
+            let cell = self.grid.get_vector_mut(x, y);
+            let index = cell.0.iter().position(|x| *x == id).unwrap();
+            cell.0.remove(index);
         }
     }
 
-	/// Retrieve entities in a region.
+    /// Retrieve entities in a region.
     pub fn query(&mut self, query: &Query) -> Vec<u32> {
         let mut result = Vec::new();
 
@@ -147,7 +166,7 @@ impl Grid {
         result
     }
 
-	/// Clear the grid.
+    /// Clear the grid.
     pub fn clear(&mut self) {
         self.grid.clear();
     }
@@ -155,7 +174,7 @@ impl Grid {
 
 #[inline]
 fn vector_hash(x: u32, y: u32) -> u64 {
-	((x as u64) << 32) | y as u64
+    ((x as u64) << 32) | y as u64
 }
 
 /// Identity hash for now

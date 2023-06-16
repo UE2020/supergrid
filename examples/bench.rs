@@ -55,7 +55,7 @@ fn main() {
             height: rng.gen_range(opt.min_size..opt.max_size),
         };
 
-        grid.insert(&ent);
+        grid.insert(&ent).expect("too many entities in cell");
         entities.push(ent);
     }
     println!("Took {:?} to insert {} entities", now.elapsed(), opt.count.to_formatted_string(&Locale::en));
