@@ -51,8 +51,16 @@ fn main() {
             id: i as u32,
             x: rng.gen_range(0..opt.width),
             y: rng.gen_range(0..opt.height),
-            width: rng.gen_range(opt.min_size..opt.max_size),
-            height: rng.gen_range(opt.min_size..opt.max_size),
+            width: if opt.min_size == opt.max_size {
+				opt.max_size
+			} else {
+				rng.gen_range(opt.min_size..opt.max_size)
+			},
+            height: if opt.min_size == opt.max_size {
+				opt.max_size
+			} else {
+				rng.gen_range(opt.min_size..opt.max_size)
+			},
         };
 
         grid.insert(&ent).expect("too many entities in cell");
