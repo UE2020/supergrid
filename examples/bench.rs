@@ -64,6 +64,6 @@ fn main() {
     for ent in entities {
         hits += grid.query(&ent.into()).len();
     }
-    println!("Took {:?} to probe {} entities", now.elapsed(), opt.count.to_formatted_string(&Locale::en));
+    println!("Took {:?} to probe {} entities; average: {:?}", now.elapsed(), opt.count.to_formatted_string(&Locale::en), now.elapsed() / opt.count as u32);
     println!("Collisions: {}; average: {}", hits.to_formatted_string(&Locale::en), hits as f32 / opt.count as f32);
 }
