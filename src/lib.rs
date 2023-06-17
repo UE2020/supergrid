@@ -187,7 +187,7 @@ impl Grid {
     /// Clear the grid.
     pub fn clear(&mut self) {
         self.grid.clear();
-        self.map.clear();
+        self.maps.clear();
     }
 }
 
