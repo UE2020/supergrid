@@ -154,7 +154,7 @@ impl Grid {
     }
 
     /// Retrieve entities in a region.
-    pub fn query(&mut self, query: &Query) -> Vec<u32> {
+    pub fn query(&self, query: &Query) -> Vec<u32> {
         let mut result = Vec::new();
 
         let sx = query.x >> self.shift;
