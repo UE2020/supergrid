@@ -189,7 +189,7 @@ impl Grid {
         result
     }
 
-    /// Clear the grid.
+    /// Clear the grid. This method is extremely slow since it iterates over every cell. As a faster alternative, just call the `delete(id)` method for each entity in the grid.
     pub fn clear(&mut self) {
         self.grid.clear();
         self.maps.clear();
