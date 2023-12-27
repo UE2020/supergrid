@@ -45,7 +45,6 @@ struct Map(ArrayVec<(u32, u32), FIXED_SIZE>);
 #[derive(Debug, Clone)]
 pub struct Table<T: Default + Clone> {
     entries: Vec<T>,
-    cached_entries_capacity: usize
 }
 
 impl<T: Default + Clone> Table<T> {
@@ -53,7 +52,7 @@ impl<T: Default + Clone> Table<T> {
     pub fn new(size: usize) -> Self {
         let cached_entries_capacity = (size * 1000).next_power_of_two() + 1;
         let entries = vec![T::default(); cached_entries_capacity];
-        Self { entries, cached_entries_capacity }
+        Self { entries }
     }
 
     /// Get entry number.
@@ -96,8 +95,9 @@ impl<T: Default + Clone> Table<T> {
 
     /// Clear the table.
     pub fn clear(&mut self) {
-        self.entries.clear();
-        self.entries.resize(self.cached_entries_capacity, T::default());
+        for entry in self.entries.iter_mut() {
+            *entry = T::default();
+        }
     }
 }
 

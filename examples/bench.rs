@@ -35,8 +35,6 @@ struct Opt {
 fn main() {
     let opt = Opt::from_args();
     let mut grid = supergrid::Grid::new(2048, opt.cell_size);
-    grid.clear(); // Ensure clearing grid doesn't make it unusable later on.
-
     println!("Setup:");
     println!(
         "\tArena width:         {}",
@@ -93,8 +91,8 @@ fn main() {
     );
     let mut hits = 0;
     let now = Instant::now();
-    for ent in entities {
-        hits += grid.query(&ent.into()).len();
+    for ent in entities.iter() {
+        hits += grid.query(&ent.clone().into()).len();
     }
     println!(
         "Took {:?} to probe {} entities; average: {:?}",
