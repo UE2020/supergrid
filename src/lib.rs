@@ -154,6 +154,8 @@ impl Grid {
             let index = cell.0.iter().position(|x| (*x & !(1 << 31)) == id).unwrap();
             cell.0.remove(index);
         }
+
+        self.maps.get_scalar_mut(id).0.clear();
     }
 
     /// Retrieve entities in a region.
