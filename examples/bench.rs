@@ -35,6 +35,8 @@ struct Opt {
 fn main() {
     let opt = Opt::from_args();
     let mut grid = supergrid::Grid::new(2048, opt.cell_size);
+    grid.clear(); // Ensure clearing grid doesn't make it unusable later on.
+
     println!("Setup:");
     println!(
         "\tArena width:         {}",
