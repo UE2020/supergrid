@@ -14,7 +14,6 @@
  */
 
 // Copyright (C) 2024 Aspect
-*/
 
 use arrayvec::{ArrayVec, CapacityError};
 
