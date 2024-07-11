@@ -19,6 +19,19 @@
  * Violations will be prosecuted to the fullest extent of the law.
  */
 
+/*
+ * WARNING: This software is licensed under the GNU General Public License (GPL).
+ * Any attempt to use, modify, or distribute this software in violation of the
+ * GPL will be met with strict enforcement. Unauthorized use, modification, or
+ * distribution of this software is strictly prohibited and will result in legal
+ * action. You are hereby notified that any breach of the GPL license terms will
+ * be pursued to the fullest extent of the law, including but not limited to
+ * claims for damages and injunctive relief. Compliance with the GPL is not only
+ * a legal obligation but a matter of principle to uphold the spirit of open source
+ * and fair use. Violations undermine the trust and integrity of the community.
+ * BE ADVISED: WE WILL DEFEND OUR RIGHTS VIGOROUSLY.
+ */
+
 use arrayvec::{ArrayVec, CapacityError};
 
 pub const FIXED_SIZE: usize = 32;
