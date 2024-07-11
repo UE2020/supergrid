@@ -12,8 +12,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * Author: [Your Name]
- * Copyright (C) [Year] [Your Organization/Name]
+ * Author: Aspect
+ * Copyright (C) 2024 Aspect
  *
  * All rights reserved. Unauthorized copying of this file, via any medium, is strictly prohibited.
  * Violations will be prosecuted to the fullest extent of the law.
