@@ -91,8 +91,11 @@ fn main() {
     );
     let mut hits = 0;
     let now = Instant::now();
+    let mut result = Vec::default();
     for ent in entities.iter() {
-        hits += grid.query(&ent.clone().into()).len();
+        result.clear();
+        grid.query(&ent.clone().into(), &mut result);
+        hits += result.len();
     }
     println!(
         "Took {:?} to probe {} entities; average: {:?}",
