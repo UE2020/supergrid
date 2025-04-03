@@ -129,9 +129,7 @@ impl<T: Default + Clone> Table<T> {
 
     /// Clear the table.
     pub fn clear(&mut self) {
-        for entry in self.entries.iter_mut() {
-            *entry = T::default();
-        }
+        self.entries.fill(T::default());
     }
 }
 
