@@ -159,7 +159,7 @@ impl Grid {
     }
 
     /// Insert an entity.
-    pub fn insert(&mut self, entity: &Entity) -> Result<(), CapacityError<u32>> {
+    pub fn insert(&mut self, entity: &Entity) -> Result<(), CapacityError> {
         let sx = entity.x >> self.shift;
         let sy = entity.y >> self.shift;
 
@@ -172,8 +172,8 @@ impl Grid {
         for y in sy..=ey {
             for x in sx..=ex {
                 let cell = self.grid.get_vector_mut(x, y);
-                map.0.push((x, y));
-                cell.0.try_push(entity.id | ((is_ideal as u32) << 31))?;
+                map.0.try_push((x, y)).map_err(|e| e.simplify())?;
+                cell.0.try_push(entity.id | ((is_ideal as u32) << 31)).map_err(|e| e.simplify())?;
             }
         }
 
@@ -185,8 +185,10 @@ impl Grid {
         let map = self.maps.get_scalar(id);
         for &(x, y) in map.0.iter() {
             let cell = self.grid.get_vector_mut(x, y);
-            let index = cell.0.iter().position(|x| (*x & !(1 << 31)) == id).unwrap();
-            cell.0.remove(index);
+            let index = cell.0.iter().position(|x| (*x & !(1 << 31)) == id);
+            if let Some(index) = index {
+                cell.0.remove(index);
+            }
         }
 
         self.maps.get_scalar_mut(id).0.clear();
