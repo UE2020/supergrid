@@ -72,8 +72,9 @@ impl From<Entity> for Query {
 #[derive(Debug, Clone, Default)]
 struct Entry(ArrayVec<u32, FIXED_SIZE>);
 
+// (id, x, y)
 #[derive(Debug, Clone, Default)]
-struct Map(ArrayVec<(u32, u32), FIXED_SIZE>);
+struct Map(ArrayVec<(u32, u32, u32), FIXED_SIZE>);
 
 /// An extremely optimized fixed-size hash table implementation.
 #[derive(Debug, Clone)]
@@ -172,7 +173,7 @@ impl Grid {
         for y in sy..=ey {
             for x in sx..=ex {
                 let cell = self.grid.get_vector_mut(x, y);
-                map.0.try_push((x, y)).map_err(|e| e.simplify())?;
+                map.0.try_push((entity.id, x, y)).map_err(|e| e.simplify())?;
                 cell.0.try_push(entity.id | ((is_ideal as u32) << 31)).map_err(|e| e.simplify())?;
             }
         }
@@ -182,16 +183,17 @@ impl Grid {
 
     /// Delete an entity by ID.
     pub fn delete(&mut self, id: u32) {
-        let map = self.maps.get_scalar(id);
-        for &(x, y) in map.0.iter() {
-            let cell = self.grid.get_vector_mut(x, y);
-            let index = cell.0.iter().position(|x| (*x & !(1 << 31)) == id);
-            if let Some(index) = index {
-                cell.0.remove(index);
-            }
-        }
-
-        self.maps.get_scalar_mut(id).0.clear();
+        let map = self.maps.get_scalar_mut(id);
+        map.0.retain(|&mut (map_id, x, y)| {
+            if map_id == id {
+                let cell = self.grid.get_vector_mut(x, y);
+                let index = cell.0.iter().position(|x| (*x & !(1 << 31)) == id);
+                if let Some(index) = index {
+                    cell.0.remove(index);
+                }
+                false
+            } else { true }
+        });
     }
 
     /// Retrieve entities in a region.
