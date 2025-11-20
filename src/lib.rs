@@ -130,9 +130,7 @@ impl<T: Default + Clone> Table<T> {
 
     /// Clear the table.
     pub fn clear(&mut self) {
-        for entry in self.entries.iter_mut() {
-            *entry = T::default();
-        }
+        self.entries.fill(T::default());
     }
 }
 
@@ -197,9 +195,7 @@ impl Grid {
     }
 
     /// Retrieve entities in a region.
-    pub fn query(&self, query: &Query) -> Vec<u32> {
-        let mut result = Vec::new();
-
+    pub fn query(&self, query: &Query, result: &mut Vec<u32>) {
         let sx = query.x >> self.shift;
         let sy = query.y >> self.shift;
 
@@ -224,7 +220,6 @@ impl Grid {
                 }
             }
         }
-        result
     }
 
     /// Clear the grid. This method is extremely slow since it iterates over every cell. As a faster alternative, just call the `delete(id)` method for each entity in the grid.
